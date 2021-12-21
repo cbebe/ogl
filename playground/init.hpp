@@ -9,14 +9,14 @@
 
 extern GLFWwindow* window;
 
-inline void initializeGLFW() {
+void initializeGLFW() {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW\n";
     std::exit(-1);
   }
 }
 
-inline void setWindowHints() {
+void setWindowHints() {
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -26,30 +26,31 @@ inline void setWindowHints() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 }
 
-inline void createWindow() {
+void die(const char* msg) {
+  std::cerr << msg << "\n";
+  glfwTerminate();
+  std::exit(-1);
+}
+
+void createWindow() {
   // Open a window and create its OpenGL context
   window = glfwCreateWindow(1024, 768, "Playground nice", NULL, NULL);
   if (window == NULL) {
-    std::cerr
-        << "Failed to open GLFW window. If you have an Intel GPU, they are "
-           "not 3.3 compatible. Try the 2.1 version of the tutorials.\n";
-    glfwTerminate();
-    std::exit(-1);
+    die("Failed to open GLFW window. If you have an Intel GPU, they are "
+        "not 3.3 compatible. Try the 2.1 version of the tutorials.");
   }
   glfwMakeContextCurrent(window);
 }
 
-inline void initializeGLEW() {
+void initializeGLEW() {
   glewExperimental = true;
   // Initialize GLEW
   if (glewInit() != GLEW_OK) {
-    std::cerr << "Failed to initialize GLEW\n";
-    glfwTerminate();
-    std::exit(-1);
+    die("Failed to initialize GLEW");
   }
 }
 
-inline void initWindow() {
+void initWindow() {
   initializeGLFW();
   setWindowHints();
   createWindow();

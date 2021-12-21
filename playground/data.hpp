@@ -54,12 +54,14 @@ static GLfloat g_vertex_buffer_data[] = {
 // One color for each vertex.
 static GLfloat g_color_buffer_data[12 * 3 * 3];
 
+double genRand() { return ((double)std::rand() / (RAND_MAX)); }
+
 void changeColor(GLuint colorBuffer, GLfloat bufferData[], size_t size) {
   for (int v = 0; v < 12 * 3; ++v) {
-    bufferData[3 * v + 0] = ((double)std::rand() / (RAND_MAX));
-    bufferData[3 * v + 1] = ((double)std::rand() / (RAND_MAX));
-    bufferData[3 * v + 2] = ((double)std::rand() / (RAND_MAX));
-    bufferData[3 * v + 3] = ((double)std::rand() / (RAND_MAX));
+    bufferData[3 * v + 0] = genRand();
+    bufferData[3 * v + 1] = genRand();
+    bufferData[3 * v + 2] = genRand();
+    bufferData[3 * v + 3] = genRand();
   }
   glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
   glBufferData(GL_ARRAY_BUFFER, size, bufferData, GL_DYNAMIC_DRAW);

@@ -14,7 +14,9 @@ GLFWwindow* window;
 #include "init.hpp"
 #include "opengl_object.hpp"
 
-inline glm::mat4 createMVP(float width, float height, glm::vec3 center) {
+glm::vec3 genRandVec3() { return glm::vec3(genRand(), genRand(), genRand()); }
+
+glm::mat4 createMVP(float width, float height, glm::vec3 center) {
   glm::mat4 Projection =
       glm::perspective(glm::radians(90.0f), width / height, 0.1f, 100.0f);
 
@@ -25,8 +27,6 @@ inline glm::mat4 createMVP(float width, float height, glm::vec3 center) {
   return Projection * View * Model;
 }
 
-inline void changeColor() {}
-
 int main(void) {
   // Not in the scope of this lesson anymore
   initWindow();
@@ -36,8 +36,6 @@ int main(void) {
   // Create and compile our GLSL program from the shaders
   auto program = OpenGLProgram(LoadShaders("simple.v.glsl", "simple.f.glsl"));
 
-  glm::mat4 cubeMVP = createMVP(4, 3, glm::vec3(0, 2, 1));
-  glm::mat4 triangleMVP = createMVP(4, 3, glm::vec3(0, 3, -1));
   GLuint MatrixID = glGetUniformLocation(program, "MVP");
 
   auto vertexBuffer = OpenGLObject<BufferObjectTraits>();
@@ -50,6 +48,9 @@ int main(void) {
   glDepthFunc(GL_LESS);
 
   do {
+    glm::mat4 cubeMVP = createMVP(4, 3, genRandVec3() + glm::vec3(1, 1, 1));
+    glm::mat4 triangleMVP =
+        createMVP(4, -3, genRandVec3() + glm::vec3(-2, 3, 3));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(program);
