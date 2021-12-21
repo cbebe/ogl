@@ -3,51 +3,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <common/shader.hpp>
 #include <iostream>
 
 GLFWwindow* window;
 
 #include <glm/glm.hpp>
+
+#include "init.hpp"
+
 using namespace glm;
-
-inline void initializeGLFW() {
-  if (!glfwInit()) {
-    std::cerr << "Failed to initialize GLFW\n";
-    exit(-1);
-  }
-}
-
-inline void setWindowHints() {
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
-                 GL_TRUE);  // To make MacOS happy; should not be needed
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-}
-
-inline void createWindow() {
-  // Open a window and create its OpenGL context
-  window = glfwCreateWindow(1024, 768, "Playground nice", NULL, NULL);
-  if (window == NULL) {
-    std::cerr
-        << "Failed to open GLFW window. If you have an Intel GPU, they are "
-           "not 3.3 compatible. Try the 2.1 version of the tutorials.\n";
-    glfwTerminate();
-    exit(-1);
-  }
-  glfwMakeContextCurrent(window);
-}
-
-inline void initializeGLEW() {
-  // Initialize GLEW
-  if (glewInit() != GLEW_OK) {
-    std::cerr << "Failed to initialize GLEW\n";
-    glfwTerminate();
-    exit(-1);
-  }
-}
 
 int main(void) {
   initializeGLFW();

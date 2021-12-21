@@ -1,3 +1,3 @@
 all:
-	cd build && $(MAKE) playground/fast
+	cd build && $(MAKE) playground
 	./playground/playground
