@@ -44,4 +44,16 @@ class OpenGLObject {
   typename T::value_type m_obj;
 };
 
+// Not sure how to make this one have parameters while the other ones don't
+class OpenGLProgram {
+ public:
+  OpenGLProgram(GLuint value) : program(value) {}
+  ~OpenGLProgram() { glDeleteProgram(program); }
+
+  operator GLuint() { return program; }
+
+ private:
+  GLuint program;
+};
+
 #endif

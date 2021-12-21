@@ -31,10 +31,10 @@ int main(void) {
   auto vertexArray = OpenGLObject<VertexArrayObjectTraits>();
 
   // Create and compile our GLSL program from the shaders
-  GLuint programID = LoadShaders("simple.v.glsl", "simple.f.glsl");
+  auto program = OpenGLProgram(LoadShaders("simple.v.glsl", "simple.f.glsl"));
 
   glm::mat4 mvp = createMVP(4, 3);
-  GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+  GLuint MatrixID = glGetUniformLocation(program, "MVP");
 
   // clang-format off
   static const GLfloat g_vertex_buffer_data[] = {
@@ -51,7 +51,7 @@ int main(void) {
   do {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(programID);
+    glUseProgram(program);
 
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 
@@ -69,8 +69,6 @@ int main(void) {
   }  // Check if the ESC key was pressed or the window was closed
   while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(window) == 0);
-
-  glDeleteProgram(programID);
 
   // Close OpenGL window and terminate GLFW
   glfwTerminate();
