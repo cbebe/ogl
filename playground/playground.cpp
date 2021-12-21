@@ -10,19 +10,22 @@ GLFWwindow* window;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "data.hpp"
 #include "init.hpp"
 #include "opengl_object.hpp"
 
-inline glm::mat4 createMVP(float width, float height) {
+inline glm::mat4 createMVP(float width, float height, glm::vec3 center) {
   glm::mat4 Projection =
-      glm::perspective(glm::radians(45.0f), width / height, 0.1f, 100.0f);
+      glm::perspective(glm::radians(90.0f), width / height, 0.1f, 100.0f);
 
   glm::mat4 View =
-      glm::lookAt(glm::vec3(4, 3, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+      glm::lookAt(glm::vec3(4, 3, -3), center, glm::vec3(-1, 1, 0));
 
   glm::mat4 Model = glm::mat4(1.0f);
   return Projection * View * Model;
 }
+
+inline void changeColor() {}
 
 int main(void) {
   // Not in the scope of this lesson anymore
@@ -33,32 +36,46 @@ int main(void) {
   // Create and compile our GLSL program from the shaders
   auto program = OpenGLProgram(LoadShaders("simple.v.glsl", "simple.f.glsl"));
 
-  glm::mat4 mvp = createMVP(4, 3);
+  glm::mat4 cubeMVP = createMVP(4, 3, glm::vec3(0, 2, 1));
+  glm::mat4 triangleMVP = createMVP(4, 3, glm::vec3(0, 3, -1));
   GLuint MatrixID = glGetUniformLocation(program, "MVP");
-
-  // clang-format off
-  static const GLfloat g_vertex_buffer_data[] = {
-    -1.0f, -1.0f,  0.0f,
-     1.0f, -1.0f,  0.0f,
-     0.0f,  1.0f,  0.0f,
-  };
-  // clang-format on
 
   auto vertexBuffer = OpenGLObject<BufferObjectTraits>();
   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
                g_vertex_buffer_data, GL_STATIC_DRAW);
 
+  // Enable depth test
+  glEnable(GL_DEPTH_TEST);
+  // Accept fragment if it closer to the camera than the former one
+  glDepthFunc(GL_LESS);
+
   do {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(program);
 
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
+    GLfloat bufferData[12 * 3 * 3];
+
+    auto colorBuffer = OpenGLObject<BufferObjectTraits>();
+    changeColor(colorBuffer, bufferData, sizeof(bufferData));
+
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &cubeMVP[0][0]);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+    glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &triangleMVP[0][0]);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glDisableVertexAttribArray(0);
 
