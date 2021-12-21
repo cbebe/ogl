@@ -26,10 +26,38 @@ int main(void) {
   // Dark blue background
   glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
+  GLuint VertexArrayID;
+  glGenVertexArrays(1, &VertexArrayID);
+  glBindVertexArray(VertexArrayID);
+
+  // Create and compile our GLSL program from the shaders
+  GLuint programID = LoadShaders("simple.v.glsl", "simple.f.glsl");
+
+  // clang-format off
+  static const GLfloat g_vertex_buffer_data[] = {
+    -1.0f, -1.0f,  0.0f,
+     1.0f, -1.0f,  0.0f,
+     0.0f,  1.0f,  0.0f,
+  };
+  // clang-format on
+
+  GLuint vertexbuffer;
+  glGenBuffers(1, &vertexbuffer);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data),
+               g_vertex_buffer_data, GL_STATIC_DRAW);
+
   do {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw nothing, see you in tutorial 2 !
+    glUseProgram(programID);
+
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDisableVertexAttribArray(0);
 
     // Swap buffers
     glfwSwapBuffers(window);
@@ -38,6 +66,11 @@ int main(void) {
   }  // Check if the ESC key was pressed or the window was closed
   while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
          glfwWindowShouldClose(window) == 0);
+
+  // Cleanup VBO
+  glDeleteBuffers(1, &vertexbuffer);
+  glDeleteVertexArrays(1, &VertexArrayID);
+  glDeleteProgram(programID);
 
   // Close OpenGL window and terminate GLFW
   glfwTerminate();

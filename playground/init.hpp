@@ -40,6 +40,7 @@ inline void createWindow() {
 }
 
 inline void initializeGLEW() {
+  glewExperimental = true;
   // Initialize GLEW
   if (glewInit() != GLEW_OK) {
     std::cerr << "Failed to initialize GLEW\n";
